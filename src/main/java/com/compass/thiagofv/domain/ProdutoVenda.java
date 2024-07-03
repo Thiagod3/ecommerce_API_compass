@@ -3,9 +3,12 @@ package com.compass.thiagofv.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import jakarta.persistence.EmbeddedId;
+
 public class ProdutoVenda implements Serializable{
 	private static final long serialVersionUID = 1L;
 
+	@EmbeddedId
 	private ProdutoVendaPK id = new ProdutoVendaPK();
 	
 	private Integer quantidade;
