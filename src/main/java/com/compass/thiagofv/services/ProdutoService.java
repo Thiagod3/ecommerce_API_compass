@@ -9,7 +9,9 @@ import com.compass.thiagofv.repositories.ProdutoRepository;
 
 @Service
 public class ProdutoService {
+	
 	private ProdutoRepository repo;
+	
 	public ProdutoService(ProdutoRepository repo) {
 		this.repo = repo;
 	}
@@ -19,8 +21,24 @@ public class ProdutoService {
 		return repo.existsById(id);
 	}
 
-	
-	//registrar ou atualizar produtos
+	// atualizar produto por id
+	public Produto updateById(Integer id, Produto updatedProduto) {
+		// Verifica se o produto com o ID fornecido existe no repositório
+		if (repo.existsById(id)) {
+			// Define o ID do produto atualizado para garantir a consistência
+			updatedProduto.setId(id);
+			// Salva o produto atualizado no repositório
+			return repo.save(updatedProduto);
+		} else {
+			// Caso o produto com o ID fornecido não exista, você pode lançar uma exceção
+			// ou retornar null, dependendo da sua lógica de negócio
+			return null;
+		}
+	}
+
+
+
+	//registrar produtos
 	public Produto create(Produto prod){
 		return repo.save(prod);
 	}

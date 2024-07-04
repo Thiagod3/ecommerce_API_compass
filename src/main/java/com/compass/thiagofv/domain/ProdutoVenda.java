@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 
+@Entity
 public class ProdutoVenda implements Serializable{
 	private static final long serialVersionUID = 1L;
 

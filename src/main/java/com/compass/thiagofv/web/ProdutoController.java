@@ -2,7 +2,6 @@ package com.compass.thiagofv.web;
 
 import java.util.List;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +30,15 @@ public class ProdutoController {
 		Produto prodCriado = produtoService.create(prod);
 		return ResponseEntity.status(HttpStatus.CREATED).body(prodCriado);
 	}
-	
-	@PatchMapping
-	public ResponseEntity<Produto> update(@RequestBody Produto prod) {
-		Produto prodCriado = produtoService.create(prod);
-		return ResponseEntity.status(HttpStatus.CREATED).body(prodCriado);
+
+	@PatchMapping("atualizar/{id}")
+	public ResponseEntity<Produto> updateProduto(@PathVariable Integer id, @RequestBody Produto updatedProduto) {
+		Produto produto = produtoService.updateById(id, updatedProduto);
+		if (produto != null) {
+			return ResponseEntity.ok(produto); // Retorna 200 OK com o produto atualizado
+		} else {
+			return ResponseEntity.notFound().build(); // Retorna 404 Not Found se o produto não existir
+		}
 	}
 	
 	@GetMapping
