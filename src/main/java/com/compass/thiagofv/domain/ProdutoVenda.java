@@ -6,6 +6,9 @@ public class ProdutoVenda {
 	private Integer produtoId;
 	private Integer quantidade;
 
+
+	public ProdutoVenda(){}
+
 	public ProdutoVenda(Integer produtoId, Integer quantidade) {
 		this.produtoId = produtoId;
 		this.quantidade = quantidade;

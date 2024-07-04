@@ -22,10 +22,7 @@ public class Produto implements Serializable{
 	private String nome;
 	private Double preco;
 	private Integer estoque;
-	
-	@OneToMany(mappedBy = "id.produto")
-	private Set<ProdutoVenda> produtos = new HashSet<>();
-	
+
 	public Produto() {}
 	
 	public Produto(String nome, Double preco, Integer estoque) {
