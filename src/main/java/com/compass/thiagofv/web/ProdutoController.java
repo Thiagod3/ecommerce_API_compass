@@ -35,9 +35,9 @@ public class ProdutoController {
 	public ResponseEntity<Produto> updateProduto(@PathVariable Integer id, @RequestBody Produto updatedProduto) {
 		Produto produto = produtoService.updateById(id, updatedProduto);
 		if (produto != null) {
-			return ResponseEntity.ok(produto); // Retorna 200 OK com o produto atualizado
+			return ResponseEntity.ok(produto);
 		} else {
-			return ResponseEntity.notFound().build(); // Retorna 404 Not Found se o produto não existir
+			return ResponseEntity.notFound().build();
 		}
 	}
 	
@@ -48,7 +48,7 @@ public class ProdutoController {
 	}
 	
 	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<Void> delete(@PathVariable("id") Integer id){
+	public ResponseEntity<Void> deleteProduto(@PathVariable("id") Integer id){
 		if (produtoService.existsById(id)) {
             produtoService.deleteById(id);
             return ResponseEntity.noContent().build();

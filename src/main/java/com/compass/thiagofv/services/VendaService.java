@@ -23,33 +23,45 @@ public class VendaService {
     @Autowired
     private ProdutoRepository produtoRepo;
 
-    public Venda create(List<ProdutoVenda> produtosVendas){
+    public boolean existsById(Integer id) {
+        return vendaRepo.existsById(id);
+    }
 
-        if(produtosVendas.isEmpty()){
-            throw new UnsupportedOperationException("Necessario ao menos um produto");
-        }
-
-        List<Produto> produtos = new ArrayList<>();
-
-        for (ProdutoVenda produtoVenda : produtosVendas){
-            Integer produtoId = produtoVenda.getProdutoId();
-            Integer quantidade = produtoVenda.getQuantidade();
-
-            Produto produto = produtoRepo.findById(produtoId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Produto nao encontrado"));
-
-            if(produto.getEstoque() < quantidade){
-                throw new UnsupportedOperationException("Estoque insuficiente");
-            }
-
-            produto.setEstoque(produto.getEstoque() - quantidade);
-            produtos.add(produto);
-            produtoRepo.save(produto);
-        }
+    public Venda create(List<ProdutoVenda> produtosVendas) {
+        List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
 
         Venda venda = new Venda();
         venda.setDataVenda(new Date());
         venda.setProdutos(produtos);
         return vendaRepo.save(venda);
+    }
+
+
+    public List<Venda> getAll(){
+        return vendaRepo.findAll();
+    }
+
+    public Venda getById(Integer id){
+        return vendaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));
+    }
+
+    public void deleteById(Integer id){
+        vendaRepo.deleteById(id);
+    }
+
+    public Venda updateById(Integer id, List<ProdutoVenda> produtosVendas){
+        if (vendaRepo.existsById(id)) {
+            Venda updatedVenda = vendaRepo.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));
+
+
+            List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
+
+            updatedVenda.setDataVenda(new Date());
+            updatedVenda.setProdutos(produtos);
+            return vendaRepo.save(updatedVenda);
+        } else {
+            return null;
+        }
     }
 }
