@@ -1,6 +1,7 @@
 package com.compass.thiagofv.domain;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +16,7 @@ public class Venda implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	private Date dataVenda;
+	private LocalDateTime dataVenda;
 
 	@ManyToMany
 	@JoinTable(
@@ -32,11 +33,11 @@ public class Venda implements Serializable {
 		this.id = id;
 	}
 
-	public Date getDataVenda() {
+	public LocalDateTime getDataVenda() {
 		return dataVenda;
 	}
 
-	public void setDataVenda(Date dataVenda) {
+	public void setDataVenda(LocalDateTime dataVenda) {
 		this.dataVenda = dataVenda;
 	}
 

@@ -10,6 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,20 +28,29 @@ public class VendaService {
     @Autowired
     private ProdutoRepository produtoRepo;
 
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+
     public boolean existsById(Integer id) {
         return vendaRepo.existsById(id);
     }
 
+
+    //criar vendas
     public Venda create(List<ProdutoVenda> produtosVendas) {
         List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
 
         Venda venda = new Venda();
-        venda.setDataVenda(new Date());
+        venda.setDataVenda(LocalDateTime.now());
         venda.setProdutos(produtos);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+        String dataFormatada = venda.getDataVenda().format(formatter);
+        System.out.println("Data formatada no padrão ISO 8601: " + dataFormatada);
+
         return vendaRepo.save(venda);
     }
 
-
+    //listar vendas
     public List<Venda> getAll(){
         return vendaRepo.findAll();
     }
@@ -45,10 +59,31 @@ public class VendaService {
         return vendaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));
     }
 
+    public List<Venda> getBetweenDate(LocalDateTime dataInicial, LocalDateTime dataFinal) {
+        return vendaRepo.findByDataVendaBetween(dataInicial, dataFinal);
+    }
+
+    public List<Venda> getLastWeek() {
+        LocalDateTime dataAtual = LocalDateTime.now();
+        LocalDateTime dataInicial = dataAtual.minusDays(7);
+        return vendaRepo.findByDataVendaBetween(dataInicial, dataAtual);
+    }
+
+    public List<Venda> getByMonth(int ano, Month mes) {
+        YearMonth anoMes = YearMonth.of(ano, mes);
+        LocalDateTime primeiroDiaMes = anoMes.atDay(1).atStartOfDay();
+        LocalDateTime ultimoDiaMes = anoMes.atEndOfMonth().atTime(23, 59, 59);
+        return vendaRepo.findByDataVendaBetween(primeiroDiaMes, ultimoDiaMes);
+    }
+
+
+    //deletar vendas
     public void deleteById(Integer id){
         vendaRepo.deleteById(id);
     }
 
+
+    //atualizar vendas
     public Venda updateById(Integer id, List<ProdutoVenda> produtosVendas){
         if (vendaRepo.existsById(id)) {
             Venda updatedVenda = vendaRepo.findById(id)
@@ -57,7 +92,7 @@ public class VendaService {
 
             List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
 
-            updatedVenda.setDataVenda(new Date());
+            updatedVenda.setDataVenda(LocalDateTime.now());
             updatedVenda.setProdutos(produtos);
             return vendaRepo.save(updatedVenda);
         } else {
