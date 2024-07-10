@@ -30,6 +30,9 @@ public class VendaUtils {
             }
 
             produto.setEstoque(produto.getEstoque() - quantidade);
+            if(produto.getEstoque() == 0){
+                produto.setAtivo(false);
+            }
             produtos.add(produto);
             produtoRepo.save(produto);
         }

@@ -22,6 +22,7 @@ public class Produto implements Serializable{
 	private String nome;
 	private Double preco;
 	private Integer estoque;
+	private Boolean ativo = true;
 
 	public Produto() {}
 	
@@ -30,6 +31,10 @@ public class Produto implements Serializable{
 		this.nome = nome;
 		this.preco = preco;
 		this.estoque = estoque;
+
+		if(estoque == 0){
+			this.ativo = false;
+		}
 	}
 
 	public Integer getId() {
@@ -62,6 +67,18 @@ public class Produto implements Serializable{
 
 	public void setEstoque(Integer estoque) {
 		this.estoque = estoque;
+
+		if(estoque == 0){
+			this.ativo = false;
+		}
+	}
+
+	public Boolean getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(Boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	@Override

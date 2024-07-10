@@ -31,7 +31,8 @@ public class ProdutoController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(prodCriado);
 	}
 
-	@PatchMapping("atualizar/{id}")
+	//endpoint atualizacao
+	@PatchMapping("/atualizar/{id}")
 	public ResponseEntity<Produto> updateProduto(@PathVariable Integer id, @RequestBody Produto updatedProduto) {
 		Produto produto = produtoService.updateById(id, updatedProduto);
 		if (produto != null) {
@@ -40,20 +41,30 @@ public class ProdutoController {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
+	@PatchMapping("/desativar/{id}")
+	public ResponseEntity<Produto> inactiveProduto(@PathVariable Integer id){
+		Produto produto = produtoService.toggleActiveById(id);
+		return ResponseEntity.ok(produto);
+	}
+
+	//endpoint listagem
 	@GetMapping
 	public ResponseEntity<List<Produto>> getAll(){
 		List<Produto> produtos = produtoService.getAll();
 		return ResponseEntity.ok(produtos);
 	}
-	
+
+	@GetMapping("/ativos")
+	public ResponseEntity<List<Produto>> getAllActive(){
+		List<Produto> produtosAtivos = produtoService.getAllActives();
+		return ResponseEntity.ok(produtosAtivos);
+	}
+
+	//endpoint deletar
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Void> deleteProduto(@PathVariable("id") Integer id){
-		if (produtoService.existsById(id)) {
             produtoService.deleteById(id);
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
 	}
 }
