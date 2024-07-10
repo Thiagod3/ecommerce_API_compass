@@ -8,6 +8,9 @@ import com.compass.thiagofv.repositories.ProdutoRepository;
 import com.compass.thiagofv.repositories.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +39,7 @@ public class VendaService {
 
 
     //criar vendas
+    @CacheEvict
     public Venda create(List<ProdutoVenda> produtosVendas) {
         List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
 
@@ -51,14 +55,17 @@ public class VendaService {
     }
 
     //listar vendas
+    @Cacheable("vendasCache")
     public List<Venda> getAll(){
         return vendaRepo.findAll();
     }
 
+    @Cacheable("vendasCache")
     public Venda getById(Integer id){
         return vendaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));
     }
 
+    @Cacheable("vendasCache")
     public List<Venda> getBetweenDate(LocalDateTime dataInicial, LocalDateTime dataFinal) {
         List<Venda> vendas = vendaRepo.findByDataVendaBetween(dataInicial, dataFinal);
 
@@ -68,12 +75,14 @@ public class VendaService {
         return vendaRepo.findByDataVendaBetween(dataInicial, dataFinal);
     }
 
+    @Cacheable("vendasCache")
     public List<Venda> getLastWeek() {
         LocalDateTime dataAtual = LocalDateTime.now();
         LocalDateTime dataInicial = dataAtual.minusDays(7);
         return vendaRepo.findByDataVendaBetween(dataInicial, dataAtual);
     }
 
+    @Cacheable("vendasCache")
     public List<Venda> getByMonth(int ano, Month mes) {
         YearMonth anoMes = YearMonth.of(ano, mes);
         LocalDateTime primeiroDiaMes = anoMes.atDay(1).atStartOfDay();
@@ -83,6 +92,7 @@ public class VendaService {
 
 
     //deletar vendas
+    @CacheEvict
     public void deleteById(Integer id){
         vendaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID '" + id + "' não encontrado!"));
         vendaRepo.deleteById(id);
@@ -90,6 +100,7 @@ public class VendaService {
 
 
     //atualizar vendas
+    @CachePut
     public Venda updateById(Integer id, List<ProdutoVenda> produtosVendas){
         Venda updatedVenda = vendaRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));

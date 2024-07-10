@@ -10,6 +10,9 @@ import com.compass.thiagofv.exceptions.ForbiddenOperationException;
 import com.compass.thiagofv.exceptions.ResourceNotFoundException;
 import com.compass.thiagofv.utils.ProdutoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.compass.thiagofv.domain.Produto;
@@ -34,12 +37,14 @@ public class ProdutoService {
 	}
 
 	// atualizar produto por id
+	@CachePut
 	public Produto updateById(Integer id, Produto updatedProduto) {
 		validateUpdateProduto(updatedProduto, id);
 		updatedProduto.setId(id);
 		return produtoRepo.save(updatedProduto);
 	}
 
+	@CachePut
 	public Produto toggleActiveById(Integer id){
 		Produto produto = produtoRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
@@ -49,16 +54,19 @@ public class ProdutoService {
 	}
 
 	//registrar produtos
+	@CacheEvict
 	public Produto create(Produto prod){
 		validateProduto(prod);
 		return produtoRepo.save(prod);
 	}
 	
 	//listar produtos
+	@Cacheable("produtosCache")
 	public List<Produto> getAll(){
 		return produtoRepo.findAll();
 	}
 
+	@Cacheable("produtosCache")
 	public List<Produto> getAllActives() {
 		return produtoRepo.findAll().stream()
 				.filter(Produto::getAtivo)
@@ -66,6 +74,7 @@ public class ProdutoService {
 	}
 
 	//deletar produtos
+	@CacheEvict
 	public void deleteById(Integer id) {
 		Produto produto = produtoRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
