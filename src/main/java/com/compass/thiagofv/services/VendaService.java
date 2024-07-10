@@ -60,6 +60,11 @@ public class VendaService {
     }
 
     public List<Venda> getBetweenDate(LocalDateTime dataInicial, LocalDateTime dataFinal) {
+        List<Venda> vendas = vendaRepo.findByDataVendaBetween(dataInicial, dataFinal);
+
+        if (vendas.isEmpty()){
+            throw new ResourceNotFoundException("Vendas não encontradas");
+        }
         return vendaRepo.findByDataVendaBetween(dataInicial, dataFinal);
     }
 
@@ -79,24 +84,21 @@ public class VendaService {
 
     //deletar vendas
     public void deleteById(Integer id){
+        vendaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID '" + id + "' não encontrado!"));
         vendaRepo.deleteById(id);
     }
 
 
     //atualizar vendas
     public Venda updateById(Integer id, List<ProdutoVenda> produtosVendas){
-        if (vendaRepo.existsById(id)) {
-            Venda updatedVenda = vendaRepo.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));
+        Venda updatedVenda = vendaRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));
 
 
-            List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
+        List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
 
-            updatedVenda.setDataVenda(LocalDateTime.now());
-            updatedVenda.setProdutos(produtos);
-            return vendaRepo.save(updatedVenda);
-        } else {
-            return null;
-        }
+        updatedVenda.setDataVenda(LocalDateTime.now());
+        updatedVenda.setProdutos(produtos);
+        return vendaRepo.save(updatedVenda);
     }
 }

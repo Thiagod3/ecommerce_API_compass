@@ -3,6 +3,7 @@ package com.compass.thiagofv.web;
 import com.compass.thiagofv.domain.ProdutoVenda;
 import com.compass.thiagofv.domain.Venda;
 import com.compass.thiagofv.dto.VendaRequest;
+import com.compass.thiagofv.exceptions.ResourceNotFoundException;
 import com.compass.thiagofv.services.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,12 +63,8 @@ public class VendaController {
     //deletar
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteVenda(@PathVariable("id") Integer id){
-        if(vendaService.existsById(id)){
-            vendaService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        vendaService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -76,10 +73,6 @@ public class VendaController {
     public ResponseEntity<Venda> update(@PathVariable("id") Integer id, @RequestBody VendaRequest vendaRequest){
         List<ProdutoVenda> novosProdutosVendas = vendaRequest.getProdutos();
         Venda venda = vendaService.updateById(id, novosProdutosVendas);
-        if (venda != null) {
-            return ResponseEntity.ok(venda);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(venda);
     }
 }
