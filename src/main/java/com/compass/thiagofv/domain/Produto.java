@@ -1,15 +1,9 @@
 package com.compass.thiagofv.domain;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 @Entity
 public class Produto implements Serializable{
@@ -23,6 +17,9 @@ public class Produto implements Serializable{
 	private Double preco;
 	private Integer estoque;
 	private Boolean ativo = true;
+
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProdutoVenda> vendaProdutos = new ArrayList<>();
 
 	public Produto() {}
 	
@@ -79,6 +76,14 @@ public class Produto implements Serializable{
 
 	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
+	}
+
+	public List<ProdutoVenda> getVendaProdutos() {
+		return vendaProdutos;
+	}
+
+	public void setVendaProdutos(List<ProdutoVenda> vendaProdutos) {
+		this.vendaProdutos = vendaProdutos;
 	}
 
 	@Override

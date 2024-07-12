@@ -1,13 +1,12 @@
 package com.compass.thiagofv.services;
 
-import com.compass.thiagofv.domain.Produto;
 import com.compass.thiagofv.domain.ProdutoVenda;
 import com.compass.thiagofv.domain.Venda;
+import com.compass.thiagofv.dto.VendaProdutoDTO;
 import com.compass.thiagofv.exceptions.ResourceNotFoundException;
 import com.compass.thiagofv.repositories.ProdutoRepository;
 import com.compass.thiagofv.repositories.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,9 +16,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -37,15 +33,15 @@ public class VendaService {
         return vendaRepo.existsById(id);
     }
 
-
-    //criar vendas
-    @CacheEvict
-    public Venda create(List<ProdutoVenda> produtosVendas) {
-        List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
-
+    // Criar vendas
+    @CacheEvict(cacheNames = "vendasCache", allEntries = true)
+    public Venda create(List<VendaProdutoDTO> vendaProdutoDTOs) {
         Venda venda = new Venda();
         venda.setDataVenda(LocalDateTime.now());
-        venda.setProdutos(produtos);
+
+        List<ProdutoVenda> vendaProdutos = utils.VendaUtils.processarProdutosVenda(vendaProdutoDTOs, produtoRepo, venda);
+
+        venda.setVendaProdutos(vendaProdutos);
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         String dataFormatada = venda.getDataVenda().format(formatter);
@@ -54,7 +50,7 @@ public class VendaService {
         return vendaRepo.save(venda);
     }
 
-    //listar vendas
+    // Listar vendas
     @Cacheable("vendasCache")
     public List<Venda> getAll(){
         return vendaRepo.findAll();
@@ -90,26 +86,25 @@ public class VendaService {
         return vendaRepo.findByDataVendaBetween(primeiroDiaMes, ultimoDiaMes);
     }
 
-
-    //deletar vendas
-    @CacheEvict
+    // Deletar vendas
+    @CacheEvict(cacheNames = "vendasCache", key = "#id")
     public void deleteById(Integer id){
         vendaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID '" + id + "' não encontrado!"));
         vendaRepo.deleteById(id);
     }
 
+    // Atualizar vendas
+    @CachePut(cacheNames = "vendasCache", key = "#id")
+    public Venda updateById(Integer id, List<VendaProdutoDTO> vendaProdutoDTOs) {
+        Venda venda = vendaRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada"));
 
-    //atualizar vendas
-    @CachePut
-    public Venda updateById(Integer id, List<ProdutoVenda> produtosVendas){
-        Venda updatedVenda = vendaRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Venda nao encontrada"));
+        List<ProdutoVenda> vendaProdutos = utils.VendaUtils.processarAtualizarProdutosVenda(vendaProdutoDTOs, produtoRepo, venda);
+        venda.setVendaProdutos(vendaProdutos);
 
+        venda.setDataVenda(LocalDateTime.now());
 
-        List<Produto> produtos = utils.VendaUtils.processarProdutosVenda(produtosVendas, produtoRepo);
-
-        updatedVenda.setDataVenda(LocalDateTime.now());
-        updatedVenda.setProdutos(produtos);
-        return vendaRepo.save(updatedVenda);
+        return vendaRepo.save(venda);
     }
+
 }

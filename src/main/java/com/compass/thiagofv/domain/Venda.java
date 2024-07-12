@@ -2,10 +2,13 @@ package com.compass.thiagofv.domain;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -18,12 +21,8 @@ public class Venda implements Serializable {
 	
 	private LocalDateTime dataVenda;
 
-	@ManyToMany
-	@JoinTable(
-			name = "venda_produto",
-			joinColumns = @JoinColumn(name = "venda_id"),
-			inverseJoinColumns = @JoinColumn(name = "produto_id"))
-	private List<Produto> produtos;
+	@OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProdutoVenda> vendaProdutos = new ArrayList<>();
 
 	public Integer getId() {
 		return id;
@@ -41,12 +40,12 @@ public class Venda implements Serializable {
 		this.dataVenda = dataVenda;
 	}
 
-	public List<Produto> getProdutos() {
-		return produtos;
+	public List<ProdutoVenda> getVendaProdutos() {
+		return vendaProdutos;
 	}
 
-	public void setProdutos(List<Produto> produtos) {
-		this.produtos = produtos;
+	public void setVendaProdutos(List<ProdutoVenda> vendaProdutos) {
+		this.vendaProdutos = vendaProdutos;
 	}
 
 	@Override
@@ -54,11 +53,11 @@ public class Venda implements Serializable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Venda venda = (Venda) o;
-		return Objects.equals(id, venda.id);
+		return Objects.equals(id, venda.id) && Objects.equals(dataVenda, venda.dataVenda) && Objects.equals(vendaProdutos, venda.vendaProdutos);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id);
+		return Objects.hash(id, dataVenda, vendaProdutos);
 	}
 }

@@ -1,13 +1,12 @@
 package com.compass.thiagofv.services;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.compass.thiagofv.domain.Produto;
 import com.compass.thiagofv.domain.Venda;
 import com.compass.thiagofv.exceptions.ExistingProductException;
 import com.compass.thiagofv.exceptions.ForbiddenOperationException;
 import com.compass.thiagofv.exceptions.ResourceNotFoundException;
+import com.compass.thiagofv.repositories.ProdutoRepository;
+import com.compass.thiagofv.repositories.ProdutoVendaRepository;
 import com.compass.thiagofv.utils.ProdutoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,8 +14,9 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.compass.thiagofv.domain.Produto;
-import com.compass.thiagofv.repositories.ProdutoRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProdutoService {
@@ -25,26 +25,29 @@ public class ProdutoService {
 	private ProdutoRepository produtoRepo;
 
 	@Autowired
+	private ProdutoVendaRepository produtoVendaRepo;
+
+	@Autowired
 	private VendaService vendaService;
 
 	public ProdutoService(ProdutoRepository produtoRepo) {
 		this.produtoRepo = produtoRepo;
 	}
 
-	//verifica se o id existe
+	// verifica se o id existe
 	public boolean existsById(Integer id) {
 		return produtoRepo.existsById(id);
 	}
 
 	// atualizar produto por id
-	@CachePut
+	@CachePut(cacheNames = "produtosCache", key = "#id")
 	public Produto updateById(Integer id, Produto updatedProduto) {
 		validateUpdateProduto(updatedProduto, id);
 		updatedProduto.setId(id);
 		return produtoRepo.save(updatedProduto);
 	}
 
-	@CachePut
+	@CachePut(cacheNames = "produtosCache", key = "#id")
 	public Produto toggleActiveById(Integer id){
 		Produto produto = produtoRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
@@ -53,14 +56,14 @@ public class ProdutoService {
 		return produtoRepo.save(produto);
 	}
 
-	//registrar produtos
-	@CacheEvict
+	// registrar produtos
+	@CacheEvict(cacheNames = "produtosCache", allEntries = true)
 	public Produto create(Produto prod){
 		validateProduto(prod);
 		return produtoRepo.save(prod);
 	}
-	
-	//listar produtos
+
+	// listar produtos
 	@Cacheable("produtosCache")
 	public List<Produto> getAll(){
 		return produtoRepo.findAll();
@@ -73,14 +76,13 @@ public class ProdutoService {
 				.collect(Collectors.toList());
 	}
 
-	//deletar produtos
-	@CacheEvict
+	// deletar produtos
+	@CacheEvict(cacheNames = "produtosCache", key = "#id")
 	public void deleteById(Integer id) {
 		Produto produto = produtoRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
-		List<Venda> vendas = vendaService.getAll();
 
-		boolean produtoAssociadoEmVenda = vendas.stream().anyMatch(venda -> venda.getProdutos().contains(produto));
+		boolean produtoAssociadoEmVenda = produtoVendaRepo.existsByProdutoId(id);
 
 		if (produtoAssociadoEmVenda) {
 			throw new ForbiddenOperationException("Não é possível excluir o produto porque está associado a uma venda");
@@ -89,7 +91,7 @@ public class ProdutoService {
 		produtoRepo.deleteById(produto.getId());
 	}
 
-	//validadores
+	// validadores
 	private void validateProduto(Produto prod) {
 		ProdutoUtils.validateProdutoData(prod);
 
@@ -118,5 +120,4 @@ public class ProdutoService {
 			throw new ExistingProductException("Produto com nome '" + prod.getNome() + "' já está cadastrado");
 		}
 	}
-
 }

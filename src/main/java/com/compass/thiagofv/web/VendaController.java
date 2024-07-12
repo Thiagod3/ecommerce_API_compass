@@ -2,8 +2,7 @@ package com.compass.thiagofv.web;
 
 import com.compass.thiagofv.domain.ProdutoVenda;
 import com.compass.thiagofv.domain.Venda;
-import com.compass.thiagofv.dto.VendaRequest;
-import com.compass.thiagofv.exceptions.ResourceNotFoundException;
+import com.compass.thiagofv.dto.VendaProdutoDTO;
 import com.compass.thiagofv.services.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,11 +23,11 @@ public class VendaController {
 
     //criação
     @PostMapping
-    public ResponseEntity<Venda> create(@RequestBody VendaRequest vendaRequest){
-        List<ProdutoVenda> produtoVendas = vendaRequest.getProdutos();
-        Venda vendaCriada = vendaService.create(produtoVendas);
+    public ResponseEntity<Venda> create(@RequestBody List<VendaProdutoDTO> vendaProdutoDTOs) {
+        Venda vendaCriada = vendaService.create(vendaProdutoDTOs);
         return ResponseEntity.status(HttpStatus.CREATED).body(vendaCriada);
     }
+
 
 
     //listagem
@@ -70,9 +69,9 @@ public class VendaController {
 
     //atualizar
     @PatchMapping("/atualizar/{id}")
-    public ResponseEntity<Venda> update(@PathVariable("id") Integer id, @RequestBody VendaRequest vendaRequest){
-        List<ProdutoVenda> novosProdutosVendas = vendaRequest.getProdutos();
-        Venda venda = vendaService.updateById(id, novosProdutosVendas);
-        return ResponseEntity.ok(venda);
+    public ResponseEntity<Venda> update(@PathVariable("id")  Integer id, @RequestBody List<VendaProdutoDTO> vendaProdutoDTOs) {
+        Venda vendaAtualizada = vendaService.updateById(id, vendaProdutoDTOs);
+        return ResponseEntity.ok(vendaAtualizada);
     }
+
 }
