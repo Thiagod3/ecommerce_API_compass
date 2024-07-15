@@ -20,7 +20,8 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
-    public final ResponseEntity<ExceptionResponse> handleForbiddenOperationException(ForbiddenOperationException ex, WebRequest request) {
+    public final ResponseEntity<ExceptionResponse> handleForbiddenOperationException(ForbiddenOperationException ex,
+                                                                                     WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.FORBIDDEN.value(),
                 HttpStatus.FORBIDDEN.getReasonPhrase(),
@@ -29,7 +30,8 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(ExistingProductException.class)
-    public final ResponseEntity<ExceptionResponse> handleExistingProductException(ExistingProductException ex, WebRequest request) {
+    public final ResponseEntity<ExceptionResponse> handleExistingProductException(ExistingProductException ex,
+                                                                                  WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.CONFLICT.value(),
                 HttpStatus.CONFLICT.getReasonPhrase(),
@@ -38,7 +40,8 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(InvalidValueException.class)
-    public final ResponseEntity<ExceptionResponse> handleInvalidValueException(InvalidValueException ex, WebRequest request) {
+    public final ResponseEntity<ExceptionResponse> handleInvalidValueException(InvalidValueException ex,
+                                                                               WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -47,11 +50,22 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public final ResponseEntity<ExceptionResponse> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+    public final ResponseEntity<ExceptionResponse> handleResourceNotFoundException(ResourceNotFoundException ex,
+                                                                                   WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 ex.getMessage());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidJWTAuthenticationException.class)
+    public final ResponseEntity<ExceptionResponse> handleInvalidJWTAuthenticationException(InvalidValueException ex,
+                                                                                            WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                ex.getMessage());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
     }
 }
