@@ -3,12 +3,8 @@ package com.compass.thiagofv.domain;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -23,6 +19,11 @@ public class Venda implements Serializable {
 
 	@OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProdutoVenda> vendaProdutos = new ArrayList<>();
+
+	@ManyToOne
+	@JoinColumn(name = "usuario_id", nullable = false)
+	private Usuario usuario;
+
 
 	public Integer getId() {
 		return id;
@@ -46,6 +47,14 @@ public class Venda implements Serializable {
 
 	public void setVendaProdutos(List<ProdutoVenda> vendaProdutos) {
 		this.vendaProdutos = vendaProdutos;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	@Override

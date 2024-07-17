@@ -1,6 +1,7 @@
 package com.compass.thiagofv.services;
 
 import com.compass.thiagofv.domain.ProdutoVenda;
+import com.compass.thiagofv.domain.Usuario;
 import com.compass.thiagofv.domain.Venda;
 import com.compass.thiagofv.dto.VendaProdutoDTO;
 import com.compass.thiagofv.exceptions.ResourceNotFoundException;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,9 +43,13 @@ public class VendaService {
 
     // Criar vendas
     @CacheEvict(cacheNames = "vendasCache", allEntries = true)
-    public Venda create(List<VendaProdutoDTO> vendaProdutoDTOs) {
+    public Venda create(List<VendaProdutoDTO> vendaProdutoDTOs, Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Usuario usuario = usuarioRepo.findByLogin(userDetails.getUsername());
+
         Venda venda = new Venda();
         venda.setDataVenda(LocalDateTime.now());
+        venda.setUsuario(usuario);
 
         List<ProdutoVenda> vendaProdutos = VendaUtils.processarProdutosVenda(vendaProdutoDTOs, produtoRepo, venda);
 

@@ -29,8 +29,8 @@ public class VendaController {
 
     //criação
     @PostMapping("/criar")
-    public ResponseEntity<Venda> create(@RequestBody List<VendaProdutoDTO> vendaProdutoDTOs) {
-        Venda vendaCriada = vendaService.create(vendaProdutoDTOs);
+    public ResponseEntity<Venda> create(@RequestBody List<VendaProdutoDTO> vendaProdutoDTOs, Authentication authentication) {
+        Venda vendaCriada = vendaService.create(vendaProdutoDTOs, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(vendaCriada);
     }
 
