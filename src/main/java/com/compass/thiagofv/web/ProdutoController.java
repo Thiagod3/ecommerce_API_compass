@@ -25,7 +25,7 @@ public class ProdutoController {
 	private ProdutoService produtoService;
 
 	//endpoint criacao
-	@PostMapping
+	@PostMapping("/criar")
 	public ResponseEntity<Produto> create(@RequestBody Produto prod) {
 		Produto prodCriado = produtoService.create(prod);
 		return ResponseEntity.status(HttpStatus.CREATED).body(prodCriado);

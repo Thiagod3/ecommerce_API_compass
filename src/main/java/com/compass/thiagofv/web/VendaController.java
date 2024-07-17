@@ -1,13 +1,17 @@
 package com.compass.thiagofv.web;
 
 import com.compass.thiagofv.domain.ProdutoVenda;
+import com.compass.thiagofv.domain.Usuario;
 import com.compass.thiagofv.domain.Venda;
 import com.compass.thiagofv.dto.VendaProdutoDTO;
+import com.compass.thiagofv.repositories.UsuarioRepository;
 import com.compass.thiagofv.services.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -21,14 +25,14 @@ public class VendaController {
     @Autowired
     private VendaService vendaService;
 
+    private UsuarioRepository usuarioRepo;
+
     //criação
-    @PostMapping
+    @PostMapping("/criar")
     public ResponseEntity<Venda> create(@RequestBody List<VendaProdutoDTO> vendaProdutoDTOs) {
         Venda vendaCriada = vendaService.create(vendaProdutoDTOs);
         return ResponseEntity.status(HttpStatus.CREATED).body(vendaCriada);
     }
-
-
 
     //listagem
     @GetMapping

@@ -1,4 +1,4 @@
-package utils;
+package com.compass.thiagofv.utils;
 
 import com.compass.thiagofv.domain.Produto;
 import com.compass.thiagofv.domain.ProdutoVenda;

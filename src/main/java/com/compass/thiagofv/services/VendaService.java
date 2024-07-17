@@ -5,7 +5,9 @@ import com.compass.thiagofv.domain.Venda;
 import com.compass.thiagofv.dto.VendaProdutoDTO;
 import com.compass.thiagofv.exceptions.ResourceNotFoundException;
 import com.compass.thiagofv.repositories.ProdutoRepository;
+import com.compass.thiagofv.repositories.UsuarioRepository;
 import com.compass.thiagofv.repositories.VendaRepository;
+import com.compass.thiagofv.utils.VendaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -27,6 +29,9 @@ public class VendaService {
     @Autowired
     private ProdutoRepository produtoRepo;
 
+    @Autowired
+    private UsuarioRepository usuarioRepo;
+
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
     public boolean existsById(Integer id) {
@@ -39,7 +44,7 @@ public class VendaService {
         Venda venda = new Venda();
         venda.setDataVenda(LocalDateTime.now());
 
-        List<ProdutoVenda> vendaProdutos = utils.VendaUtils.processarProdutosVenda(vendaProdutoDTOs, produtoRepo, venda);
+        List<ProdutoVenda> vendaProdutos = VendaUtils.processarProdutosVenda(vendaProdutoDTOs, produtoRepo, venda);
 
         venda.setVendaProdutos(vendaProdutos);
 
@@ -99,7 +104,7 @@ public class VendaService {
         Venda venda = vendaRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada"));
 
-        List<ProdutoVenda> vendaProdutos = utils.VendaUtils.processarAtualizarProdutosVenda(vendaProdutoDTOs, produtoRepo, venda);
+        List<ProdutoVenda> vendaProdutos = VendaUtils.processarAtualizarProdutosVenda(vendaProdutoDTOs, produtoRepo, venda);
         venda.setVendaProdutos(vendaProdutos);
 
         venda.setDataVenda(LocalDateTime.now());
