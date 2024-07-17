@@ -5,6 +5,7 @@ import com.compass.thiagofv.securityJwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 @EnableWebSecurity
 @Configuration
+@Lazy
 public class SecurityConfig {
 
     @Autowired
@@ -58,7 +60,7 @@ public class SecurityConfig {
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         // Permissão para endpoints de autenticação
-                        .requestMatchers("/auth/signin", "/auth/refresh/**").permitAll()
+                        .requestMatchers("/auth/signin", "/auth/refresh/**", "/usuarios/cadastro").permitAll()
                         // Restrições para endpoints de produtos
                         .requestMatchers("/produtos/**").hasRole("ADMIN")
                         // Restrições para endpoints de vendas

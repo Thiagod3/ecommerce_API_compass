@@ -1,9 +1,5 @@
 package com.compass.thiagofv.dto;
 
-import com.compass.thiagofv.domain.ProdutoVenda;
-
-import java.util.List;
-
 public class VendaProdutoDTO {
     private Integer produtoId;
     private Integer quantidade;
