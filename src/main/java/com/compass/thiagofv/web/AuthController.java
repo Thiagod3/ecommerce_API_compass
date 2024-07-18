@@ -4,6 +4,7 @@ import com.compass.thiagofv.domain.Usuario;
 import com.compass.thiagofv.dto.AuthDTO;
 import com.compass.thiagofv.dto.LoginResponseDTO;
 import com.compass.thiagofv.dto.RegisterDTO;
+import com.compass.thiagofv.dto.ResetSenhaDTO;
 import com.compass.thiagofv.infra.security.TokenService;
 import com.compass.thiagofv.repositories.UsuarioRepository;
 import com.compass.thiagofv.services.EmailService;
@@ -67,17 +68,18 @@ public class AuthController {
     }
 
     @PostMapping("/reset-senha/resetar")
-    public ResponseEntity resetarSenha(@RequestHeader("Authorization") String authHeader, @RequestBody String novaSenha) {
+    public ResponseEntity resetarSenha(@RequestHeader("Authorization") String authHeader, @RequestBody ResetSenhaDTO request) {
         String resetToken = authHeader.substring(7);
         Usuario usuario = usuarioRepo.findByLogin(tokenService.validateToken(resetToken));
         String email = usuario.getEmail();
 
-        if (email.isEmpty()) {
+        if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido ou expirado.");
         }
 
-        usuario.setPassword(new BCryptPasswordEncoder().encode(novaSenha));
+        usuario.setPassword(new BCryptPasswordEncoder().encode(request.novaSenha()));
         repository.save(usuario);
         return ResponseEntity.ok("Senha atualizada com sucesso.");
     }
+
 }
